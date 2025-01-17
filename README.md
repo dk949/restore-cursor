@@ -80,3 +80,9 @@ ending in `.txt`.
 
 > [!WARNING]
 > Use at most one of `ignore`, `override_ignore` or `only`!
+
+
+## TODO
+
+- [ ] Fix lsp formatting jump
+- [ ] Don't jump when going to a line from the command line
