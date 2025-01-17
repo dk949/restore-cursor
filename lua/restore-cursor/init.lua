@@ -91,11 +91,9 @@ return function(pat)
     local M = {}
 
     local function restoreCursor(ev)
-        if not bufMatches(ev.file, vim.bo.filetype, pat) then
-            return
-        end
+        if not bufMatches(ev.file, vim.bo.filetype, pat) then return end
         local line = vim.fn.line("'\"")
-        if line < 1 and line > line("$") then return end
+        if line < 1 or line > vim.fn.line("$") then return end
         vim.api.nvim_feedkeys('g`"', "n", false)
     end
 
