@@ -83,6 +83,23 @@ local function bufMatches(filename, filetype, pat)
     return not patternMatches(filename, filetype, pat.override_ignore)
 end
 
+
+local function shouldRun()
+    if vim.g.restore_cursor_disable then
+        if vim.g.restore_cursor_enable_next then
+            vim.g.restore_cursor_enable_next = false
+            return true
+        end
+        return false
+    end
+    if vim.g.restore_cursor_disable_next then
+        vim.g.restore_cursor_disable_next = false
+        return false
+    end
+    return true
+end
+
+
 return function(pat)
     ---@type Patterns
     pat = vim.tbl_deep_extend("keep", typeCheckPattern(pat), default_patterns)
@@ -91,6 +108,7 @@ return function(pat)
     local M = {}
 
     local function restoreCursor(ev)
+        if not shouldRun() then return end
         if not bufMatches(ev.file, vim.bo.filetype, pat) then return end
         local line = vim.fn.line("'\"")
         if line < 1 or line > vim.fn.line("$") then return end
