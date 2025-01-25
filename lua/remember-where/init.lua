@@ -99,15 +99,15 @@ end
 
 
 local function shouldRun()
-    if vim.g.restore_cursor_disable then
-        if vim.g.restore_cursor_enable_next then
-            vim.g.restore_cursor_enable_next = false
+    if vim.g.remember_where_disable then
+        if vim.g.remember_where_enable_next then
+            vim.g.remember_where_enable_next = false
             return true
         end
         return false
     end
-    if vim.g.restore_cursor_disable_next then
-        vim.g.restore_cursor_disable_next = false
+    if vim.g.remember_where_disable_next then
+        vim.g.remember_where_disable_next = false
         return false
     end
     return true
@@ -124,7 +124,7 @@ return function(opt)
 
     local M = {}
 
-    local function restoreCursor(ev)
+    local function remember(ev)
         if not shouldRun() then return end
         if not bufMatches(ev.file, vim.bo.filetype, opt.pat) then return end
         local line = vim.fn.line("'\"")
@@ -135,10 +135,10 @@ return function(opt)
     end
 
     function M.installHandler()
-        M.group = vim.api.nvim_create_augroup("restore_cursor_group", { clear = true })
+        M.group = vim.api.nvim_create_augroup("remember_where_group", { clear = true })
         M.autocmd = vim.api.nvim_create_autocmd(opt.event, {
             group = M.group,
-            callback = restoreCursor,
+            callback = remember,
             desc = [[When file is opened, jump to the last position of the cursor]],
         })
     end

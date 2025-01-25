@@ -1,4 +1,4 @@
-# restore.nvim
+# remember-where
 
 Simple plugin to restore cursor position after opening a file without using
 `mkview`.
@@ -10,10 +10,10 @@ To enable the plugin with the default configuration, add this to your
 `init.lua`.
 
 ```lua
-require "restore-cursor" {}.installHandler()
+require "remember-where" {}.installHandler()
 ```
 
 ## Configuration
 
 
-See `:help restore-cursor` for detailed configuration options.
+See `:help remember-where` for detailed configuration options.
