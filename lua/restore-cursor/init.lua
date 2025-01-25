@@ -9,6 +9,12 @@
 
 ---@alias Patterns IgnorePatterns|OnlyPatterns|OverrideIgnorePatterns|{}
 
+---@class Options
+---@field pat Patterns?            @ Which files to ignore/not ignore
+---@field event (string|string[])? @ Which event should the restore trigger on (BufReadPost by default)
+---@field cb_pre (fun(): nil)?     @ callback to execute before restoring. Not executed if the buffer is not restored
+---@field cb_post (fun(): nil)?    @ callback to execute after restoring. Not executed if the buffer is not restored
+
 ---return a valid pattern object or throw an error
 ---@param pat any
 local function typeCheckPattern(pat)
@@ -46,6 +52,14 @@ local default_patterns = {
         filetype_patterns = { "commit", "^xxd$", "^gitrebase$" },
         filename_patterns = {},
     }
+}
+
+---@type Options
+local default_optiosn = {
+    pat = default_patterns,
+    event = "BufReadPost",
+    cb_pre = nil,
+    cb_post = nil,
 }
 
 ---@param str string
@@ -100,24 +114,29 @@ local function shouldRun()
 end
 
 
-return function(pat)
-    ---@type Patterns
-    pat = vim.tbl_deep_extend("keep", typeCheckPattern(pat), default_patterns)
-    if pat.only then pat.override_ignore = nil end
+---@param opt Options
+return function(opt)
+    if not opt then opt = {} end
+    ---@type Options
+    opt = vim.tbl_deep_extend("keep", opt, default_optiosn)
+    if opt.pat.only then opt.pat.override_ignore = nil end
+    opt.pat = vim.tbl_deep_extend("keep", typeCheckPattern(opt.pat), default_patterns)
 
     local M = {}
 
     local function restoreCursor(ev)
         if not shouldRun() then return end
-        if not bufMatches(ev.file, vim.bo.filetype, pat) then return end
+        if not bufMatches(ev.file, vim.bo.filetype, opt.pat) then return end
         local line = vim.fn.line("'\"")
         if line < 1 or line > vim.fn.line("$") then return end
+        if opt.cb_pre then opt.cb_pre() end
         vim.api.nvim_feedkeys('g`"', "n", false)
+        if opt.cb_post then opt.cb_post() end
     end
 
     function M.installHandler()
         M.group = vim.api.nvim_create_augroup("restore_cursor_group", { clear = true })
-        M.autocmd = vim.api.nvim_create_autocmd({ "BufReadPost" }, {
+        M.autocmd = vim.api.nvim_create_autocmd(opt.event, {
             group = M.group,
             callback = restoreCursor,
             desc = [[When file is opened, jump to the last position of the cursor]],
