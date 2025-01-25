@@ -1,0 +1,118 @@
+*restire-cursro.txt*    Restore Cursor Position plugin for Neovim
+
+===============================================================================
+Contents ~
+
+1. Introduction...................................|restore-cursor-introduction|
+2. Configuration.................................|restore-cursor-configuration|
+3. Global variables....................................|restore-cursor-globals|
+
+===============================================================================
+1. Introduction ~
+                                                  *restore-cursor-introduction*
+
+This plugin restores the cursor position when you leave a buffer and come back
+to it. It is useful when you are working on a file and you need to switch to
+another buffer and then come back to the original buffer. This plugin will
+restore the cursor position to where it was when you left the buffer.
+
+You can install it using your favourite plugin manager.
+
+===============================================================================
+2. Configuration ~
+                                                 *restore-cursor-configuration*
+
+
+To enable the plugin with default options, add the following line to your
+`init.lua`:>
+    require('restore-cursor'){}.installHandler()
+<
+
+You can also configure the plugin with the following options (passed to the
+function returned by `require('restore-cursor')`):
+
+
+`pat`                                                      *restore-cursor-pat*
+
+	This option allows you to specify which files to ignore or not ignore.
+	The value should be a table with one key, which can be `ignore`,
+	`only`, or `override_ignore`.
+
+	Each of these can have two keys, `filetype_patterns` and
+	`filename_patterns` (both are optional).
+
+	The value of each key should be a list-like table of regular
+	expressions.
+
+	The meaning of these keys is as follows:
+
+`pat.ignore`                                        *restore-cursor-pat-ignore*
+
+	Files matching any of the patterns provided will be ignored in
+	addition to the ones ignored by default.
+
+	By default the following files are ignored: File types containing the
+	word "commit", "xxd" filetype and "gitrebase" filetype.
+
+`pat.only`                                            *restore-cursor-pat-only*
+
+	Only files matching any of the patterns provided will be restored.
+	The default list of ignored files is not considered.
+
+`pat.override_ignore`                      *restore-cursor-pat-override_ignore*
+
+	Files matching any of the patterns provided will be ignored. The
+	default list of ignored files is not considered.
+
+	See |restore-cursor-par-ignore| for the default values.
+
+`event`                                                  *restore-cursor-event*
+
+	This option allows you to specify which event should trigger the
+	restore. The default is `BufReadPost`.
+
+	You can pass a string or a list of strings. This is passed directly to
+	`nvim_create_augroup`
+
+`cb_pre`                                                *restore-cursor-cb_pre*
+
+	This option allows you to specify a callback to execute before
+	restoring the cursor position. This is not executed if the buffer is
+	not restored.
+
+	A buffer will not be restored if it is ignored via the patterns (see
+	|restore-cursor-pat|), or if the line number is out of range for the
+	buffer.
+
+`cb_post`                                              *restore-cursor-cb_post*
+
+	This option allows you to specify a callback to execute after
+	restoring the cursor position. Similarly to |restore-cursor-cb_pre|,
+	this is not executed if the buffer is not restored.
+
+
+===============================================================================
+3. Global variables ~
+                                                       *restore-cursor-globals*
+
+`restore_cursor_disable`                               *restore-cursor-disable*
+
+	Disables the plugin.
+
+	See |restore-cursor-enable-next|.
+
+`restore_cursor_disable_next`                     *restore-cursor-disable-next*
+
+	If set to `true`, the next time a buffer would have been restored, do
+	not restore it.
+
+	See |restore-cursor-disable| to disable the plugin fully.
+
+`restore_cursor_enable_next`                       *restore-cursor-enable-next*
+
+	If set to `true`, the next time a buffer would have been restored
+	whilst restore_cursor_disable is set to `true`, do restore it.
+
+	Works like the opposite of |restore-cursor-disable-next|.
+
+vim:tw=78:ts=8:noet:ft=text:norl:
